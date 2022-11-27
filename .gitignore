@@ -39,3 +39,6 @@ lerna-debug.log*
 
 # for json visualization
 v.json
+
+# database
+*.db
