@@ -36,3 +36,6 @@ lerna-debug.log*
 
 # enviroment files
 *.env
+
+# for json visualization
+v.json
