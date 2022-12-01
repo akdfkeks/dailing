@@ -2,7 +2,7 @@ module.exports = {
   apps: [
     {
       name: 'dailing',
-      script: './dist/main',
+      script: './dist/main.js',
       instances: 1,
       exec_mode: 'cluster',
       max_memory_restart: '200M',
