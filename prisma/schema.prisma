@@ -15,7 +15,6 @@ model User {
     id       String  @unique
     pw       String
     name     String
-    // profileImage String        @default(value: "")
     family   Family? @relation(fields: [familyId], references: [uuid], onUpdate: Cascade)
     familyId String?
     post     Post[]
@@ -29,7 +28,7 @@ model Family {
 
 model Post {
     uuid      String   @id @default(value: uuid())
-    user      User     @relation(fields: [userId], references: [id])
+    user      User     @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
     userId    String
     title     String   @default(value: "")
     content   String   @default(value: "")

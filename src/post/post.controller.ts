@@ -1,36 +1,64 @@
 import {
+  Body,
   Controller,
   Get,
   Post,
   Res,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
+  UsePipes,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { PostValidation } from 'src/pipe/post.pipe';
+import { StorageService } from 'src/provider/storage.service';
 import { CreatePostDto } from './dto/create-post.dto';
+import { PostDotDto } from './dto/get-postDot.dto';
 import { PostService } from './post.service';
 
-@Controller('dailing')
+// @UseGuards(AuthGuard)
+@Controller('post')
 export class PostController {
-  constructor(private readonly scheduleService: PostService) {}
+  constructor(
+    private readonly scheduleService: PostService,
+    private readonly storageService: StorageService,
+  ) {}
 
-  @Get('/post/family')
-  async getFamilyDailing() {
-    const data = await this.scheduleService.getFamilyDailing({
-      userId: 'test1',
-    });
-
-    return { success: true, message: '', data };
+  @Get('/dot')
+  async getFamilyDot() {
+    const data = await this.scheduleService.getFamilyDot({ userId: 'test1' });
+    return { success: true, message: '데이터', data };
   }
 
-  @Post('/post')
+  @Post('/family')
+  async getFamilyDailing(@Body() b: any) {
+    const data = await this.scheduleService.getFamilyDailing({
+      userId: 'test1',
+      date: b.date,
+    });
+
+    return { success: true, message: '데이터', data };
+  }
+
+  // @Get('/family')
+  // async getFamilyDailing() {
+  //   const data = await this.scheduleService.getFamilyDailing({
+  //     userId: 'test1',
+  //   });
+
+  //   return { success: true, message: '', data };
+  // }
+
+  @Post('/')
   @UseInterceptors(FileInterceptor('image'))
   async createPost(
     @UploadedFile()
     image: Express.Multer.File,
+    @Body()
     data: CreatePostDto,
   ) {
-    const result = await this.scheduleService.createPost(data);
-    if (result) return { success: true, message: '', data: null };
+    const src = await this.storageService.upload(image);
+    const createResult = await this.scheduleService.createPost(data, src);
+    return { success: true, message: '', data: null };
   }
 }
