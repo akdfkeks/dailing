@@ -1,6 +1,9 @@
 import { INestApplication, Injectable, OnModuleInit } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
-import { SignupDto } from 'src/auth/dto/signup.dto';
+import { Request, Response, NextFunction } from 'express';
+import { Prisma } from '@prisma/client';
+import * as _ from 'lodash';
+import * as dayjs from 'dayjs';
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit {
@@ -28,7 +31,44 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
     });
   }
 
-  async findFamilyPost({ userId }) {
+  async findAllFamilyPost({ userId }) {
+    const {
+      family: { user },
+    } = await this.user.findUnique({
+      where: {
+        id: userId,
+      },
+      include: {
+        family: {
+          include: {
+            user: {
+              include: {
+                post: {
+                  where: {},
+                  select: {
+                    uuid: true,
+                    title: true,
+                    content: true,
+                    image: true,
+                    lat: true,
+                    lng: true,
+                    createdAt: true,
+                  },
+                  orderBy: {
+                    createdAt: 'asc',
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return user;
+  }
+
+  async findDailingPost({ userId, today }: { userId: string; today?: Date }) {
     const {
       family: { user },
     } = await this.user.findUnique({
@@ -43,8 +83,8 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
                 post: {
                   where: {
                     createdAt: {
-                      // lte: '',
-                      // gte: '',
+                      lte: today ? this.getEndOfDay(today) : null,
+                      gte: today ? this.getStartOfDay(today) : null,
                     },
                   },
                   select: {
@@ -68,5 +108,20 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
     });
 
     return user;
+  }
+
+  getKST() {
+    return dayjs().add(9, 'hour').toDate();
+  }
+
+  getUTC() {
+    return dayjs().toDate();
+  }
+
+  getStartOfDay(d: Date) {
+    return dayjs(d).startOf('day').toDate();
+  }
+  getEndOfDay(d: Date) {
+    return dayjs(d).endOf('day').toDate();
   }
 }

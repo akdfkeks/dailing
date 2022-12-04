@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   Post,
   Res,
   UploadedFile,
@@ -17,27 +18,35 @@ import { PostDotDto } from './dto/get-postDot.dto';
 import { PostService } from './post.service';
 
 // @UseGuards(AuthGuard)
-@Controller('post')
+@Controller('posts')
 export class PostController {
   constructor(
     private readonly scheduleService: PostService,
     private readonly storageService: StorageService,
   ) {}
 
-  @Get('/dot')
-  async getFamilyDot() {
-    const data = await this.scheduleService.getFamilyDot({ userId: 'test1' });
+  @Get('/dots')
+  async getDot() {
+    const data = await this.scheduleService.getPostsDot({ userId: 'test1' });
     return { success: true, message: '데이터', data };
   }
 
   @Get('/family')
-  async getFamilyDailing(@Body() b: any) {
+  async getDailing(@Body() b: any) {
     const data = await this.scheduleService.getFamilyDailing({
       userId: 'test1',
       // date: b.date,
     });
 
     return { success: true, message: '데이터', data };
+  }
+
+  @Get('/:id')
+  async getPost(@Param('id') id: string) {
+    // TODO: 가족의 게시물만 조회할 수 있도록 수정하기
+    const r = await this.scheduleService.getPost({ id });
+
+    return { success: true, message: '게시글', data: r };
   }
 
   @Post('/')

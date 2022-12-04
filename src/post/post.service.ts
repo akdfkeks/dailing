@@ -7,8 +7,8 @@ import { CreatePostDto } from './dto/create-post.dto';
 export class PostService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getFamilyDot({ userId }) {
-    const members = await this.prisma.findFamilyPost({ userId });
+  async getPostsDot({ userId }) {
+    const members = await this.prisma.findAllFamilyPost({ userId });
 
     let postExistUser: {
       userId: string;
@@ -51,7 +51,8 @@ export class PostService {
   }
 
   async getFamilyDailing({ userId }) {
-    const members = await this.prisma.findFamilyPost({ userId });
+    const today = this.prisma.getKST();
+    const members = await this.prisma.findDailingPost({ userId, today });
     let r = [];
     members.forEach((member) => {
       if (member.post.length > 0) {
@@ -80,11 +81,21 @@ export class PostService {
         image: src ? src : '',
         lat: 0,
         lng: 0,
+        createdAt: this.prisma.getKST(),
       },
     });
 
     if (!result) return false;
     return true;
+  }
+
+  async getPost({ id }: { id: string }) {
+    const r = await this.prisma.post.findUnique({
+      where: {
+        uuid: id,
+      },
+    });
+    return r;
   }
 }
 
