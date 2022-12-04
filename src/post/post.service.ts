@@ -7,10 +7,8 @@ import { CreatePostDto } from './dto/create-post.dto';
 export class PostService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getFamilyDot(data: { userId: string }) {
-    const {
-      family: { user },
-    } = await this.getFamilyPost(data);
+  async getFamilyDot({ userId }) {
+    const members = await this.prisma.findFamilyPost({ userId });
 
     let postExistUser: {
       userId: string;
@@ -19,7 +17,7 @@ export class PostService {
 
     let p = new Map<string, string[]>();
 
-    user.forEach((user) => {
+    members.forEach((user) => {
       if (user.post.length > 0) {
         const d = {
           userId: user.id,
@@ -52,7 +50,22 @@ export class PostService {
     return r;
   }
 
-  async getFamilyDailing(data: { userId: string; date: string }) {}
+  async getFamilyDailing({ userId }) {
+    const members = await this.prisma.findFamilyPost({ userId });
+    let r = [];
+    members.forEach((member) => {
+      if (member.post.length > 0) {
+        r.push({
+          userId: member.id,
+          name: member.name,
+          profile: member.profile,
+          post: member.post,
+        });
+      }
+    });
+    // console.log(r);
+    return r;
+  }
 
   async createPost(data: CreatePostDto, src?: string) {
     const result = await this.prisma.post.create({
@@ -72,57 +85,6 @@ export class PostService {
 
     if (!result) return false;
     return true;
-  }
-
-  // async getFamilyDailing(data: FindFamilyPostDto) {
-  //   const r = await this.getFamilyPost(data);
-  //   const userListWithPost = r.family.user.map((user) => {
-  //     return {
-  //       userId: user.id,
-  //       name: user.name,
-  //       post: user.post,
-  //     };
-  //   });
-
-  //   return {
-  //     // familyId: r.family.uuid,
-  //     // familyName: r.family.name,
-  //     familyMember: userListWithPost,
-  //   };
-  // }
-
-  private async getFamilyPost(data: FindFamilyPostDto) {
-    const r = await this.prisma.user.findUnique({
-      where: {
-        id: data.userId,
-      },
-      include: {
-        family: {
-          include: {
-            user: {
-              include: {
-                post: {
-                  select: {
-                    uuid: true,
-                    title: true,
-                    content: true,
-                    image: true,
-                    lat: true,
-                    lng: true,
-                    createdAt: true,
-                  },
-                  orderBy: {
-                    createdAt: 'asc',
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    });
-
-    return r;
   }
 }
 

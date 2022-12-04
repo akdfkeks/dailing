@@ -30,24 +30,15 @@ export class PostController {
     return { success: true, message: '데이터', data };
   }
 
-  @Post('/family')
+  @Get('/family')
   async getFamilyDailing(@Body() b: any) {
     const data = await this.scheduleService.getFamilyDailing({
       userId: 'test1',
-      date: b.date,
+      // date: b.date,
     });
 
     return { success: true, message: '데이터', data };
   }
-
-  // @Get('/family')
-  // async getFamilyDailing() {
-  //   const data = await this.scheduleService.getFamilyDailing({
-  //     userId: 'test1',
-  //   });
-
-  //   return { success: true, message: '', data };
-  // }
 
   @Post('/')
   @UseInterceptors(FileInterceptor('image'))
@@ -58,7 +49,12 @@ export class PostController {
     data: CreatePostDto,
   ) {
     const src = await this.storageService.upload(image);
-    const createResult = await this.scheduleService.createPost(data, src);
-    return { success: true, message: '', data: null };
+    const createResult = await this.scheduleService.createPost(
+      data,
+
+      src,
+    );
+    if (!createResult) throw new Error('게시글 생성 실패');
+    return { success: true, message: '업로드 성공', data: null };
   }
 }

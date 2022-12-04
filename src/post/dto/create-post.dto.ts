@@ -1,9 +1,13 @@
-import { IsNumber } from 'class-validator';
+import { IsNumber, IsString } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 export class CreatePostDto {
-  userId: string;
+  userId?: string;
+
+  @IsString()
   title: string;
+
+  @IsString()
   content: string;
 
   @Transform((v) => parseFloat(v.value))

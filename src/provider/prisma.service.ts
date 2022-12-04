@@ -27,4 +27,46 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
       },
     });
   }
+
+  async findFamilyPost({ userId }) {
+    const {
+      family: { user },
+    } = await this.user.findUnique({
+      where: {
+        id: userId,
+      },
+      include: {
+        family: {
+          include: {
+            user: {
+              include: {
+                post: {
+                  where: {
+                    createdAt: {
+                      // lte: '',
+                      // gte: '',
+                    },
+                  },
+                  select: {
+                    uuid: true,
+                    title: true,
+                    content: true,
+                    image: true,
+                    lat: true,
+                    lng: true,
+                    createdAt: true,
+                  },
+                  orderBy: {
+                    createdAt: 'asc',
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return user;
+  }
 }
