@@ -68,7 +68,13 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
     return user;
   }
 
-  async findDailingPost({ userId, today }: { userId: string; today?: Date }) {
+  async findDailingPost({
+    userId,
+    target,
+  }: {
+    userId: string;
+    target?: string;
+  }) {
     const {
       family: { user },
     } = await this.user.findUnique({
@@ -83,8 +89,8 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
                 post: {
                   where: {
                     createdAt: {
-                      lte: today ? this.getEndOfDay(today) : null,
-                      gte: today ? this.getStartOfDay(today) : null,
+                      lte: this.getEndOfDay(dayjs(target).toDate()),
+                      gte: this.getStartOfDay(dayjs(target).toDate()),
                     },
                   },
                   select: {
@@ -110,18 +116,31 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
     return user;
   }
 
-  getKST() {
-    return dayjs().add(9, 'hour').toDate();
+  getKST(target?: string) {
+    if (target) {
+      const d = dayjs(target).add(9, 'hour').toDate();
+      // console.log(d);
+      return d;
+    } else {
+      const d = dayjs().add(9, 'hour').toDate();
+      // console.log(d);
+      return d;
+    }
   }
 
   getUTC() {
     return dayjs().toDate();
   }
 
-  getStartOfDay(d: Date) {
-    return dayjs(d).startOf('day').toDate();
+  private getStartOfDay(d: Date) {
+    const r = dayjs(d).startOf('date').add(9, 'hour').toDate();
+    console.log(`start: ${r.toUTCString()}`);
+    return r;
   }
-  getEndOfDay(d: Date) {
-    return dayjs(d).endOf('day').toDate();
+
+  private getEndOfDay(d: Date) {
+    const r = dayjs(d).endOf('date').add(9, 'hour').toDate();
+    console.log(`end: ${r.toUTCString()}`);
+    return r;
   }
 }

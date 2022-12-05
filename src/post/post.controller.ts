@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   Post,
+  Query,
   Res,
   UploadedFile,
   UseGuards,
@@ -32,10 +33,10 @@ export class PostController {
   }
 
   @Get('/family')
-  async getDailing(@Body() b: any) {
+  async getDailing(@Body() b: any, @Query('date') date?: string) {
     const data = await this.scheduleService.getFamilyDailing({
       userId: 'test1',
-      // date: b.date,
+      date,
     });
 
     return { success: true, message: '데이터', data };

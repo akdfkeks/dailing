@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../provider/prisma.service';
-import { FindFamilyPostDto } from './dto/find-familyPost.dto';
 import { CreatePostDto } from './dto/create-post.dto';
+import * as dayjs from 'dayjs';
 
 @Injectable()
 export class PostService {
@@ -50,9 +50,8 @@ export class PostService {
     return r;
   }
 
-  async getFamilyDailing({ userId }) {
-    const today = this.prisma.getKST();
-    const members = await this.prisma.findDailingPost({ userId, today });
+  async getFamilyDailing({ userId, date }: { userId: string; date?: string }) {
+    const members = await this.prisma.findDailingPost({ userId, target: date });
     let r = [];
     members.forEach((member) => {
       if (member.post.length > 0) {
@@ -79,8 +78,8 @@ export class PostService {
         title: data.title,
         content: data.content,
         image: src ? src : '',
-        lat: 0,
-        lng: 0,
+        lat: data.lat,
+        lng: data.lng,
         createdAt: this.prisma.getKST(),
       },
     });
