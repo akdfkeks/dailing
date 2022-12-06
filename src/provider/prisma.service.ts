@@ -4,11 +4,17 @@ import { Request, Response, NextFunction } from 'express';
 import { Prisma } from '@prisma/client';
 import * as _ from 'lodash';
 import * as dayjs from 'dayjs';
+import * as utc from 'dayjs/plugin/utc';
+import * as timezone from 'dayjs/plugin/timezone';
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit {
   async onModuleInit() {
     await this.$connect();
+
+    dayjs.extend(utc);
+    dayjs.extend(timezone);
+    dayjs.tz.setDefault('Asia/Seoul');
   }
 
   async enableShutdownHooks(app: INestApplication) {
@@ -89,8 +95,8 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
                 post: {
                   where: {
                     createdAt: {
-                      lte: this.getEndOfDay(dayjs(target).toDate()),
-                      gte: this.getStartOfDay(dayjs(target).toDate()),
+                      lte: this.getEndOfDay(this.getKST(target)),
+                      gte: this.getStartOfDay(this.getKST(target)),
                     },
                   },
                   select: {
@@ -118,12 +124,12 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
 
   getKST(target?: string) {
     if (target) {
-      const d = dayjs(target).add(9, 'hour').toDate();
-      // console.log(d);
+      const d = dayjs(target).add(1, 'day').toDate();
+
       return d;
     } else {
       const d = dayjs().add(9, 'hour').toDate();
-      // console.log(d);
+
       return d;
     }
   }
@@ -133,14 +139,16 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
   }
 
   private getStartOfDay(d: Date) {
-    const r = dayjs(d).startOf('date').add(9, 'hour').toDate();
-    console.log(`start: ${r.toUTCString()}`);
+    // const r = dayjs(d).startOf('date').add(9, 'hour').toDate();
+    const r = dayjs(d).startOf('date').add(9, 'hour').add(-1, 'day').toDate();
+
     return r;
   }
 
   private getEndOfDay(d: Date) {
-    const r = dayjs(d).endOf('date').add(9, 'hour').toDate();
-    console.log(`end: ${r.toUTCString()}`);
+    // const r = dayjs(d).endOf('date').add(9, 'hour').toDate();
+    const r = dayjs(d).endOf('date').add(9, 'hour').add(-1, 'day').toDate();
+
     return r;
   }
 }
