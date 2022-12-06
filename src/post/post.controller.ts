@@ -32,14 +32,14 @@ export class PostController {
     return { success: true, message: '데이터', data };
   }
 
-  @Get('/family')
-  async getDailing(@Body() b: any, @Query('date') date?: string) {
+  @Post('/family')
+  async getDailing(@Body() b: any) {
     const data = await this.scheduleService.getFamilyDailing({
       userId: 'test1',
-      date,
+      date: b.date,
     });
 
-    return { success: true, message: '데이터', data };
+    return { success: true, message: 'Dailing 게시글', data };
   }
 
   @Get('/:id')
