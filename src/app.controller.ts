@@ -1,4 +1,11 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthGuard } from './guard/auth.guard';
 
 @Controller('/')
@@ -12,7 +19,7 @@ export class AppController {
 
   @UseGuards(AuthGuard)
   @Post()
-  postHomeWithGuard(@Req() req) {
+  postHomeWithGuard(@Request() req: any) {
     return req.user;
   }
 }

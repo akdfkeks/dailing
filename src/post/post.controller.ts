@@ -28,14 +28,14 @@ export class PostController {
 
   @Get('/dots')
   async getDot() {
-    const data = await this.scheduleService.getPostsDot({ userId: 'test1' });
+    const data = await this.scheduleService.getPostsDot({ userId: '신형만' });
     return { success: true, message: '데이터', data };
   }
 
   @Post('/family')
   async getDailing(@Body() b: any) {
     const data = await this.scheduleService.getFamilyDailing({
-      userId: 'test1',
+      userId: '신형만',
       date: b.date,
     });
 

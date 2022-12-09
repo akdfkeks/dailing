@@ -125,7 +125,6 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
   getKST(target?: string) {
     if (target) {
       const d = dayjs(target).add(1, 'day').toDate();
-
       return d;
     } else {
       const d = dayjs().add(9, 'hour').toDate();
@@ -141,6 +140,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
   private getStartOfDay(d: Date) {
     // const r = dayjs(d).startOf('date').add(9, 'hour').toDate();
     const r = dayjs(d).startOf('date').add(9, 'hour').add(-1, 'day').toDate();
+    console.log(r.toISOString());
 
     return r;
   }
@@ -148,6 +148,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
   private getEndOfDay(d: Date) {
     // const r = dayjs(d).endOf('date').add(9, 'hour').toDate();
     const r = dayjs(d).endOf('date').add(9, 'hour').add(-1, 'day').toDate();
+    console.log(r.toISOString());
 
     return r;
   }
